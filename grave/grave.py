@@ -79,21 +79,24 @@ def _generate_straight_edges(edges, pos, styles, *, ax):
     properties = {k: [None] * N for k in styles[proto_edge]
                   if k in _VALID_EDGE_STYLE}
 
-    for j, (u, v) in enumerate(edges):
+    edges = sorted(edges(data=True), key=lambda e: e[2]['weight'], reverse=True)
+    for j, (u, v, data) in enumerate(edges):
         edge_pos[j] = (pos[u], pos[v])
         for key, values in properties.items():
             values[j] = styles[(u, v)][key]
         edge_indx[j] = (u, v)
     key_map = {'color': 'colors',
                'width': 'linewidths',
-               'style': 'linestyle',}
+               'style': 'linestyle'}
 
     renamed_properties = {key_map[k]: v
                           for k, v in properties.items()}
     line_art = LineCollection(edge_pos,
                               transOffset=ax.transData,
                               zorder=1,
-                              **renamed_properties)
+                              **renamed_properties,
+#                              alpha=0.05
+    )
     line_art.set_transform(ax.transData)
     return line_art, edge_indx
 
